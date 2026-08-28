@@ -5,6 +5,7 @@ import {
 import { drizzle as drizzleNeon } from "drizzle-orm/neon-serverless";
 import { Pool as NodePool } from "pg";
 import { Pool as NeonPool, neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
 import * as schema from "./schema";
 
 /**
@@ -59,13 +60,18 @@ function getDb(): AppDatabase {
   }
 
   if (isNeon(connectionString)) {
-    // Node 22+ (and Vercel) provide a global WebSocket; older runtimes need one
-    // supplying explicitly.
+    // Node 22+ (and Vercel) provide a global WebSocket; Node 20 does not, so
+    // `ws` is imported statically as the fallback rather than required lazily,
+    // which would not resolve once this module is bundled as ESM.
     if (typeof globalThis.WebSocket === "undefined") {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      neonConfig.webSocketConstructor = require("ws");
+      neonConfig.webSocketConstructor = ws;
     }
     const pool = new NeonPool({ connectionString });
+    // An idle client that errors emits on the pool. Without a listener that
+    // becomes an unhandled exception and takes the whole function down.
+    pool.on("error", (error: Error) => {
+      console.error("Postgres pool error:", error);
+    });
     // The two drivers expose the same query surface for everything used here.
     client = drizzleNeon(pool, { schema }) as unknown as AppDatabase;
     return client;
@@ -83,6 +89,10 @@ function getDb(): AppDatabase {
     connectionString,
     ssl: local ? undefined : { rejectUnauthorized: false },
     max: poolSize(),
+  });
+
+  pool.on("error", (error) => {
+    console.error("Postgres pool error:", error);
   });
 
   client = drizzleNode(pool, { schema });
