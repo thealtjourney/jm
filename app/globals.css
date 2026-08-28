@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #0f4c5c;
+  --color-brand-light: #5f9ea0;
+  --color-accent: #d35400;
+  --color-ink: #22333b;
+  --color-muted: #64757d;
+  --color-line: #dde5e8;
+  --color-surface: #ffffff;
+  --color-canvas: #eef2f3;
+
+  --color-journey-property: #006064;
+  --color-journey-customer: #e67e22;
+  --color-journey-owner: #8e44ad;
+
+  --color-answer-excellence: #1e8449;
+  --color-answer-process: #2980b9;
+  --color-answer-policy: #8e44ad;
+  --color-answer-tsm: #c2185b;
+
+  --font-sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+}
+
+html,
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Rich text stored as HTML in `activities` and `excellence`. */
+.rich-text ul {
+  list-style: disc;
+  padding-left: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.rich-text li {
+  line-height: 1.6;
+}
+
+.rich-text strong {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.rich-text p {
+  margin-bottom: 0.75rem;
+}
+
+/* Horizontal journey rails */
+.rail {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
+.rail::-webkit-scrollbar {
+  height: 8px;
+}
+
+.rail::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 999px;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
