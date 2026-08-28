@@ -6,8 +6,8 @@
  * badges it as placeholder wherever it appears. Replace it with your published
  * TSM return before anyone uses this for assurance or reporting.
  *
- * Replace via the admin UI on /performance, or by editing this file and
- * re-seeding with a different `source`:
+ * Replace via PATCH /api/performance, or by editing this file and re-seeding
+ * with a different `source`:
  *   "return"   - the published TSM return
  *   "internal" - management reporting between returns
  */

@@ -288,7 +288,7 @@ export async function getRoles(): Promise<RoleLens[]> {
   }));
 }
 
-/** Every measure with its current and prior figures, for /performance. */
+/** Every measure with its current and prior figures. Serves the API. */
 export async function getPerformance() {
   const [tsmRows, resultRows] = await Promise.all([
     db.select().from(tsms).orderBy(asc(tsms.code)),

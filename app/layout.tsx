@@ -45,12 +45,6 @@ export default function RootLayout({
                 TSM coverage
               </Link>
               <Link
-                href="/performance"
-                className="rounded-lg px-3 py-2 text-muted transition hover:bg-canvas hover:text-brand"
-              >
-                Performance
-              </Link>
-              <Link
                 href="/challenges"
                 className="rounded-lg px-3 py-2 text-muted transition hover:bg-canvas hover:text-brand"
               >

@@ -293,7 +293,7 @@ async function main() {
   console.log("Seed complete.");
   console.log(
     "\nNote: TSM figures are ILLUSTRATIVE placeholders. Replace them with your\n" +
-      "published return on /performance before using this for assurance.",
+      "published return via PATCH /api/performance before relying on them.",
   );
 }
 

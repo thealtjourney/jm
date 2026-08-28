@@ -85,14 +85,19 @@ mapped against it.
 
 ## Performance figures
 
-`tsm_results` holds a value and target per measure per period, and `/performance`
-shows them against target with movement since the prior year and the team
-answerable — derived from stage ownership.
+`tsm_results` holds a value and target per measure per period. Figures appear
+in context on each stage — against target, with movement since the prior year —
+rather than on a separate dashboard, and the Executive lens rolls them up to a
+status per stage.
 
 **Every seeded figure is illustrative.** Rows are seeded with
-`source: "placeholder"` and badged as such everywhere they appear. Saving a real
-figure (in the UI, or via `PATCH /api/performance`) marks it `return` or
-`internal`, which also protects it from being overwritten by a re-seed.
+`source: "placeholder"` and badged as such everywhere they appear. Recording a
+real figure via `PATCH /api/performance` marks it `return` or `internal`, which
+also protects it from being overwritten by a re-seed.
+
+There is no performance dashboard. That is deliberate: this is an overview of
+how the service works, and the numbers earn their place by sitting next to the
+standard they measure, not in a table of their own.
 
 ## Challenges
 
@@ -265,6 +270,4 @@ rejected before any write. Policy URLs are restricted to `http`/`https`.
 - `/library` — every policy and process, and the stages that reference it
 - `/coverage` — all 22 TSMs against the stages that move them, flagging any
   measure with no reportable stage
-- `/performance` — every measure against target, with movement and the
-  answerable team; admins can record real figures here
 - `/challenges` — what the frontline says the map gets wrong
