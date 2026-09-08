@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { House } from "lucide-react";
 import type { StageDetail as Stage } from "@/lib/queries";
 import { STATUS_META, formatValue, describeTrend } from "@/lib/status";
 
@@ -46,7 +47,7 @@ export default function StageDetail({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [challengeOpen, setChallengeOpen] = useState(false);
-  const dialogRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   const [excellence, setExcellence] = useState(stage.excellence);
   const [activities, setActivities] = useState(stage.activities);
@@ -57,13 +58,17 @@ export default function StageDetail({
   const [tsmCodes, setTsmCodes] = useState(stage.tsms.map((t) => t.code));
 
   useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+    const dialog = dialogRef.current;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const overflow = document.body.style.overflow;
+    dialog?.showModal();
+    document.body.style.overflow = "hidden";
+    return () => {
+      dialog?.close();
+      document.body.style.overflow = overflow;
+      previousFocus?.focus();
     };
-    document.addEventListener("keydown", onKey);
-    dialogRef.current?.focus();
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, []);
 
   function toggle(list: string[], code: string): string[] {
     return list.includes(code) ? list.filter((c) => c !== code) : [...list, code];
@@ -105,19 +110,17 @@ export default function StageDetail({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink/50 p-4 backdrop-blur-sm sm:p-8"
+    <dialog
+      ref={dialogRef}
+      aria-label={`${stage.title} stage detail`}
+      onCancel={onClose}
+      className="fixed inset-0 z-50 m-0 flex h-dvh max-h-none w-full max-w-none items-start justify-center overflow-y-auto border-0 bg-transparent p-4 backdrop:bg-ink/50 backdrop:backdrop-blur-sm sm:p-8"
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
     >
       <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={`${stage.title} stage detail`}
-        tabIndex={-1}
-        className="w-full max-w-4xl rounded-2xl bg-surface shadow-2xl outline-none"
+        className="w-full max-w-4xl shrink-0 rounded-2xl bg-surface text-ink shadow-2xl"
       >
         {/* Header */}
         <div
@@ -126,7 +129,7 @@ export default function StageDetail({
         >
           <div className="flex items-start gap-4">
             <span aria-hidden className="text-3xl leading-none">
-              {stage.icon}
+              <House size={30} />
             </span>
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider opacity-80">
@@ -198,10 +201,10 @@ export default function StageDetail({
         </div>
 
         {/* What we do */}
-        <div className="border-b border-line px-6 py-5">
-          <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-muted">
+        <details open={editing || undefined} className="border-b border-line px-6 py-5">
+          <summary className="text-sm font-semibold text-brand">
             What happens at this stage
-          </h3>
+          </summary>
           {editing ? (
             <textarea
               value={activities}
@@ -211,17 +214,18 @@ export default function StageDetail({
             />
           ) : (
             <div
-              className="rich-text text-sm text-ink"
+              className="rich-text mt-4 text-ink"
               dangerouslySetInnerHTML={{ __html: stage.activities }}
             />
           )}
-        </div>
+        </details>
 
         {/* Section tabs */}
         <div className="flex flex-wrap gap-2 border-b border-line px-6 py-3">
           {SECTIONS.map((s) => (
             <button
               key={s.key}
+              aria-pressed={section === s.key}
               onClick={() => setSection(s.key)}
               className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
                 section === s.key ? "text-white" : "bg-canvas text-muted hover:text-ink"
@@ -248,7 +252,7 @@ export default function StageDetail({
               />
             ) : (
               <div
-                className="rich-text text-sm"
+                className="rich-text excellence-list"
                 dangerouslySetInnerHTML={{ __html: stage.excellence }}
               />
             ))}
@@ -352,7 +356,7 @@ export default function StageDetail({
                         </span>
                         {!t.reportable && (
                           <span className="rounded-md bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
-                            Indicative only — not reportable for this tenure
+                            Indicative link — reporting scope needs review
                           </span>
                         )}
                       </div>
@@ -464,7 +468,7 @@ export default function StageDetail({
           </div>
         )}
       </div>
-    </div>
+    </dialog>
   );
 }
 

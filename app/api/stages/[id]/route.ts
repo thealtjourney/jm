@@ -104,8 +104,8 @@ export async function PATCH(
     );
   }
 
-  // TSMs are not reported for shared ownership (LCHO). Property-journey stages
-  // deliver measures against rented stock, so their links stay reportable.
+  // Keep shared ownership links provisional pending a provider-specific
+  // reporting-scope review. This default is not a regulatory exemption.
   const [journey] = await db
     .select({ tenure: journeys.tenure })
     .from(journeys)

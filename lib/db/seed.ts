@@ -39,7 +39,7 @@ import { PROCESS_SEED } from "../data/processes";
 import { TEAM_SEED } from "../data/teams";
 import { ROLE_SEED } from "../data/roles";
 import { TSM_RESULT_SEED } from "../data/tsm-results";
-import { JOURNEY_SEED, STAGE_SEED } from "../data/stages";
+import { JOURNEY_SEED, STAGE_SEED, STAGE_TARGET_DAYS } from "../data/stages";
 
 const force = process.argv.includes("--force");
 
@@ -146,6 +146,7 @@ async function main() {
       type: s.type,
       accountableTeamId,
       accountableRole: s.accountableRole,
+      targetDays: STAGE_TARGET_DAYS[s.code] ?? null,
       sortOrder: index,
     };
     const editorial = { activities: s.activities, excellence: s.excellence };
@@ -166,9 +167,8 @@ async function main() {
     await db.delete(stagePolicies).where(eq(stagePolicies.stageId, stage.id));
     await db.delete(stageProcesses).where(eq(stageProcesses.stageId, stage.id));
 
-    // TSMs are not reported for shared ownership (LCHO). Property-journey
-    // stages deliver the compliance and Decent Homes measures against rented
-    // stock, so their links stay reportable.
+    // Keep shared ownership links provisional until the provider reviews
+    // reporting scope. This mapping default is not a regulatory exemption.
     const reportable = tenureByKey.get(s.journeyKey) !== "LCHO";
 
     if (s.tsmCodes.length) {

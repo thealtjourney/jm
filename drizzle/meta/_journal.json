@@ -8,6 +8,13 @@
       "when": 1787924991529,
       "tag": "0000_bent_juggernaut",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788376283842,
+      "tag": "0001_stage_target_days",
+      "breakpoints": true
     }
   ]
 }

@@ -71,17 +71,15 @@ so an unknown or missing value simply falls back to the full map.
 
 ### A note on TSMs and tenure
 
-Tenant Satisfaction Measures are reported for **Low Cost Rental Accommodation**.
-Shared ownership households sit outside the TSM perception survey, so measuring
-a shared ownership stage against a TSM and reporting it would be wrong.
+The stored `reportable` flag describes the current draft mapping; it is not a
+regulatory determination. Shared ownership links remain indicative pending a
+provider-specific review. RSH requirements cover LCRA and/or LCHO depending on
+the measure, stock and provider size. Do not treat shared ownership as exempt.
 
-Shared ownership stages still influence those measures, though, so the links are
-kept rather than dropped: each row in `stage_tsms` carries a `reportable` flag.
-Shared ownership links are stored as **indicative only**, badged as such in the
-UI, and excluded from the coverage report.
-
-All 22 measures are seeded, and every one has at least one reportable stage
-mapped against it.
+The original 22 measures are seeded. The current RSH requirements also include
+**BS06 Electrical safety checks**, added in June 2026. The coverage page flags
+its absence until the library has been updated. See the
+[current technical requirements](https://www.gov.uk/government/publications/tenant-satisfaction-measures-technical-requirements).
 
 ## Performance figures
 
@@ -266,8 +264,44 @@ rejected before any write. Policy URLs are restricted to `http`/`https`.
 
 ## Pages
 
-- `/` — the journey map; click any stage for its four answers
+- `/` — journey explorer: three journey selectors, connected stage map or list,
+  excellence standards beside TSM links, and role selection
+- `/map` — the journey map; click any stage for its four answers
+- `/processes` — the process directory, one tile per process grouped by owning
+  team
+- `/processes/[code]` — one process start to finish: the stages it runs
+  through, in journey order, with accountable teams and indicative timescales
 - `/library` — every policy and process, and the stages that reference it
-- `/coverage` — all 22 TSMs against the stages that move them, flagging any
+- `/coverage` — the library’s TSMs against the stages that influence them, flagging any
   measure with no reportable stage
-- `/challenges` — what the frontline says the map gets wrong
+- `/tsm/[code]` — one measure in full: trend against target, the stages that
+  move it, and open challenges on those stages
+- `/board-pack` — print-friendly: each journey collapsed to a status per
+  stage, plus the full TSM position with year-on-year movement
+- `/search` — one box over stages, processes, policies and measures
+- `/challenges` — what the frontline says the map gets wrong, with open
+  challenges rolled up by team and stage
+
+## Stage timescales
+
+`stages.target_days` holds an indicative target for how long each bounded
+stage should take (e.g. 20 days void turnaround, 10 working days for a stage 1
+complaint response). Null means the stage is ongoing rather than bounded, and
+shows as "ongoing". Seeded values live in `STAGE_TARGET_DAYS` in
+`lib/data/stages.ts` and are **illustrative** — set your own service
+standards there or directly in the database.
+
+## September 2026 redesign
+
+The default page opens the journey explorer, with colour-coded property,
+rented customer and shared ownership journeys. Selecting a stage displays
+excellence standards and TSM connections together. Process, policy, feedback,
+admin editing and board-pack capabilities are retained.
+
+A journey or stage can be linked directly using
+`/map?journey=customer&stage=C4`. Direct links reveal their target even when a
+saved role preference normally filters that stage out. Search and TSM links
+use this format. The detail dialog uses native modal focus handling.
+
+The database connection and existing deployment architecture are unchanged.
+See [the design review](DESIGN_REVIEW.md) for findings and suggested next work.

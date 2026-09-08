@@ -12,6 +12,7 @@ import {
   stageChallenges,
 } from "./db/schema";
 import { CURRENT_PERIOD, PRIOR_PERIOD } from "./data/tsm-results";
+import { journeyTheme } from "./journey-presentation";
 
 export type TeamRef = { code: string; name: string; directorate: string };
 
@@ -46,6 +47,8 @@ export type StageDetail = {
   excellence: string;
   accountableTeam: TeamRef | null;
   accountableRole: string;
+  /** Indicative days this stage should take; null means it is ongoing. */
+  targetDays: number | null;
   /** Every other team that runs a process at this stage. */
   contributingTeams: TeamRef[];
   openChallenges: number;
@@ -173,7 +176,7 @@ export async function getJourneys(): Promise<JourneyDetail[]> {
     name: journey.name,
     description: journey.description,
     tenure: journey.tenure,
-    colour: journey.colour,
+    colour: journeyTheme(journey.key).colour,
     stages: journey.stages.map((stage) => {
       const stageTsmList: StageTsm[] = stage.stageTsms
         .map((link) => {
@@ -230,6 +233,7 @@ export async function getJourneys(): Promise<JourneyDetail[]> {
         excellence: stage.excellence,
         accountableTeam: accountable,
         accountableRole: stage.accountableRole,
+        targetDays: stage.targetDays,
         contributingTeams: [...contributing.values()].sort((a, b) =>
           a.name.localeCompare(b.name),
         ),
@@ -331,6 +335,40 @@ export async function getPerformance() {
   });
 }
 
+/**
+ * One measure in full: its definition and every organisation-scope result,
+ * oldest period first. Serves the TSM drill-down page.
+ */
+export async function getTsmDetail(code: string) {
+  const tsm = await db.query.tsms.findFirst({
+    where: eq(tsms.code, code),
+    with: { results: true },
+  });
+  if (!tsm) return null;
+
+  const series = tsm.results
+    .filter((r) => r.scope === "Organisation")
+    .map((r) => ({
+      period: r.period,
+      value: toNumber(r.value),
+      target: toNumber(r.target),
+      source: r.source,
+    }))
+    .sort((a, b) => a.period.localeCompare(b.period));
+
+  return {
+    code: tsm.code,
+    name: tsm.name,
+    category: tsm.category,
+    measureType: tsm.measureType,
+    definition: tsm.definition,
+    calculation: tsm.calculation,
+    unit: tsm.unit,
+    higherIsBetter: tsm.higherIsBetter,
+    series,
+  };
+}
+
 /** Challenges raised against the map, newest first. */
 export async function getChallenges(status?: string) {
   const rows = await db.query.stageChallenges.findMany({
@@ -343,7 +381,7 @@ export async function getChallenges(status?: string) {
     stageCode: c.stage.code,
     stageTitle: c.stage.title,
     journeyName: c.stage.journey.name,
-    journeyColour: c.stage.journey.colour,
+    journeyColour: journeyTheme(c.stage.journey.key).colour,
     owningTeam: c.stage.accountableTeam?.name ?? "Unowned",
     submittedBy: c.submittedBy,
     submittedRole: c.submittedRole,

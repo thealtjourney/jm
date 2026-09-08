@@ -83,6 +83,13 @@ export const stages = pgTable(
     accountableRole: text("accountable_role").notNull().default(""),
     /** When the content was last confirmed as accurate by its owner. */
     lastReviewedAt: timestamp("last_reviewed_at", { withTimezone: true }),
+    /**
+     * Indicative target for how long this stage should take, in days.
+     * Null means the stage is ongoing (e.g. "Living in the home") rather than
+     * a bounded piece of work. This is what turns a journey from a sequence
+     * into a timeline.
+     */
+    targetDays: integer("target_days"),
 
     sortOrder: integer("sort_order").notNull().default(0),
     updatedAt: timestamp("updated_at", { withTimezone: true })

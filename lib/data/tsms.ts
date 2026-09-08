@@ -1,11 +1,11 @@
 /**
- * The 22 Tenant Satisfaction Measures set out in the Regulator of Social
- * Housing's TSM Standard. TP* are perception measures collected by survey;
+ * The original 22 measures used by this prototype. The current RSH set
+ * also includes BS06 (electrical safety), added in June 2026. TP* are perception measures collected by survey;
  * the rest are management information reported by the landlord.
  *
- * Note: TSMs are reported for Low Cost Rental Accommodation (LCRA). Shared
- * ownership (LCHO) households are outside the TSM perception survey, which is
- * why shared ownership stages flag their measures as indicative only.
+ * Shared ownership links are provisional in this prototype. Reporting scope
+ * depends on the individual measure, stock type and provider size; the stored
+ * reportable flag is a mapping decision, not a statement of regulatory scope.
  */
 
 export type TsmSeed = {

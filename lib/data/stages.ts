@@ -655,3 +655,34 @@ export const STAGE_SEED: StageSeed[] = [
     processCodes: ["PRC-NOMINATE", "PRC-RICS", "PRC-OPENMKT", "PRC-CONVEY"],
   },
 ];
+
+/**
+ * Indicative stage timescales, in days. These turn a journey from a sequence
+ * into a timeline: how long should this stage take when it goes well?
+ *
+ * Values are ILLUSTRATIVE first-pass figures drawn from common UK social
+ * housing service standards (e.g. 10 working days for a stage 1 complaint
+ * response under the Complaint Handling Code, ~20 days void turnaround).
+ * Stages that are ongoing rather than bounded (living in the home, asset
+ * management) carry no target and are shown as "ongoing".
+ */
+export const STAGE_TARGET_DAYS: Record<string, number> = {
+  P1: 90, // land acquisition to approval
+  P2: 540, // construction programme
+  P3: 365, // defects liability period
+  P4: 20, // void turnaround, key to key
+  P6: 180, // disposal / retrofit decision to completion
+  C2: 5, // contact resolved or triaged
+  C4: 15, // advert to sign-up
+  C5: 42, // settling-in visits complete
+  C7: 28, // routine repair completed
+  C8: 56, // ASB case reviewed / resolved
+  C9: 10, // stage 1 complaint response (working days)
+  C10: 28, // notice period to tenancy end
+  O2: 5, // contact resolved or triaged
+  O4: 90, // marketing to reservation
+  O5: 56, // reservation to completion
+  O6: 14, // completion to settled move-in
+  O8: 90, // staircasing application to completion
+  O9: 56, // resale nomination period
+};

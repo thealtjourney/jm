@@ -3,7 +3,7 @@ import { getJourneys, getLibraries } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
-type Ref = { code: string; title: string; journey: string; colour: string };
+type Ref = { code: string; title: string; journey: string; colour: string; href: string };
 
 export default async function LibraryPage() {
   const [journeys, libraries] = await Promise.all([
@@ -22,6 +22,7 @@ export default async function LibraryPage() {
         title: stage.title,
         journey: journey.name,
         colour: journey.colour,
+        href: `/map?journey=${journey.key}&stage=${stage.code}`,
       };
       for (const p of stage.policies) {
         policyRefs.set(p.code, [...(policyRefs.get(p.code) ?? []), ref]);
@@ -46,8 +47,8 @@ export default async function LibraryPage() {
         </h1>
         <p className="mt-3 text-lg text-muted">
           The same mapping read the other way round: every policy and process,
-          and the journey stages where it bites. A policy with no stages against
-          it is a gap worth questioning.
+          and the journey stages where it applies. Open a stage to see the
+          standards and teams connected to it.
         </p>
       </div>
 
@@ -107,6 +108,7 @@ export default async function LibraryPage() {
                     <LibraryItem
                       key={process.code}
                       name={process.name}
+                      href={`/processes/${process.code}`}
                       description={process.description}
                       refs={processRefs.get(process.code) ?? []}
                     />
@@ -119,7 +121,7 @@ export default async function LibraryPage() {
       </div>
 
       <p className="mt-10 text-sm text-muted">
-        <Link href="/" className="font-semibold text-brand underline">
+        <Link href="/map" className="font-semibold text-brand underline">
           Back to the journey map
         </Link>
       </p>
@@ -130,18 +132,25 @@ export default async function LibraryPage() {
 function LibraryItem({
   name,
   url,
+  href,
   description,
   refs,
 }: {
   name: string;
   url?: string;
+  /** Internal link, e.g. a process's start-to-finish timeline. */
+  href?: string;
   description: string;
   refs: Ref[];
 }) {
   return (
     <li className="rounded-xl border border-line bg-surface p-4">
       <p className="font-semibold text-ink">
-        {url ? (
+        {href ? (
+          <Link href={href} className="underline underline-offset-2">
+            {name}
+          </Link>
+        ) : url ? (
           <a
             href={url}
             target="_blank"
@@ -157,14 +166,15 @@ function LibraryItem({
       <p className="mt-1 text-sm text-muted">{description}</p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {refs.map((ref) => (
-          <span
+          <Link
             key={`${ref.journey}-${ref.code}`}
+            href={ref.href}
             title={ref.journey}
-            className="rounded-md px-2 py-0.5 text-xs font-semibold text-white"
+            className="rounded-md px-2 py-0.5 text-xs font-semibold text-white hover:underline"
             style={{ backgroundColor: ref.colour }}
           >
             {ref.title}
-          </span>
+          </Link>
         ))}
         {!refs.length && (
           <span className="rounded-md border border-dashed border-line px-2 py-0.5 text-xs font-semibold text-muted">
