@@ -2,14 +2,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { ArrowUpRight, BookOpen, Building2, ChartNoAxesCombined, ChevronRight, FileChartColumn, House, Menu, MessageSquareText, Route, Search, Sprout, Workflow, X } from "lucide-react";
+import { ArrowUpRight, BookOpen, Building2, ChartNoAxesCombined, ChevronRight, House, Menu, MessageSquareText, Route, Search, Sprout, Workflow, X } from "lucide-react";
 const navigation = [
     { href: "/", label: "Journey explorer", icon: Route },
     { href: "/coverage", label: "TSM connections", icon: ChartNoAxesCombined },
     { href: "/processes", label: "Processes", icon: Workflow },
     { href: "/library", label: "Policy library", icon: BookOpen },
     { href: "/challenges", label: "Feedback & challenges", icon: MessageSquareText },
-    { href: "/board-pack", label: "Board pack", icon: FileChartColumn },
 ];
 export default function AppShell({ children }: {
     children: React.ReactNode;

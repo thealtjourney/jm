@@ -73,7 +73,6 @@ export default function JourneyMap({ journeys, library, initialAdmin, roles, act
     return (<main className="journey-workspace">
       <div className="workspace-heading">
         <div><p className="eyebrow"><span /> THE RESIDENT EXPERIENCE</p><h1>Every stage. A better experience<span>.</span></h1><p className="heading-description">Explore the journeys that connect our homes, our services and our residents.</p></div>
-        <Link href="/board-pack" className="button-secondary no-print"><FileText size={17}/> Board pack <ArrowUpRight size={16}/></Link>
       </div>
       <div className="overview-strip"><span><strong>{journeys.length}</strong> connected journeys</span><i /><span><strong>{totalStages}</strong> stages to explore</span><i /><Link href="/coverage"><strong>{allTsms.size}</strong> TSMs linked <ArrowUpRight size={14}/></Link><span className="overview-note"><Sparkles size={15}/> Excellence at every step</span></div>
 
