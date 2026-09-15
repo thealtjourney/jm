@@ -1,7 +1,10 @@
 import Link from "next/link";
+import { Route } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getJourneys, getLibraries } from "@/lib/queries";
 import { STATUS_META } from "@/lib/status";
+import { repairsStepForProcess } from "@/lib/process-workflows";
+import { groupJourneyStages } from "@/lib/journey-explorer";
 
 export const dynamic = "force-dynamic";
 
@@ -20,12 +23,13 @@ export default async function ProcessPage({
 
   const process = libraries.processes.find((p) => p.code === code);
   if (!process) notFound();
+  const repairStep = repairsStepForProcess(code);
 
   // The stages this process runs through, kept in journey order.
   const lanes = journeys
     .map((journey) => ({
       journey,
-      stages: journey.stages
+      stages: groupJourneyStages(journey).flatMap(group => group.stages)
         .map((stage, index) => ({ stage, position: index + 1 }))
         .filter(({ stage }) => stage.processes.some((p) => p.code === code)),
     }))
@@ -61,6 +65,8 @@ export default async function ProcessPage({
         </p>
         {lanes.some(l => l.stages.some(({ stage }) => stage.tsms.some(t => t.source === "placeholder"))) && <p className="mt-3 text-sm font-medium text-accent">Performance badges include illustrative figures, not verified stage-level results.</p>}
       </div>
+
+      {repairStep && <Link href={`/processes/repairs?step=${repairStep.id}`} className="process-walkthrough-link mb-8"><span><Route size={20} /><strong>See this in the complete repairs process</strong><small>From the first report through delivery, follow-up and learning · Draft</small></span><span aria-hidden="true">→</span></Link>}
 
       {lanes.length === 0 && (
         <div className="rounded-2xl border border-dashed border-line bg-surface p-10 text-center">
@@ -99,7 +105,7 @@ export default async function ProcessPage({
                     style={{ backgroundColor: journey.colour }}
                     title="Sum of the indicative targets for the bounded stages this process touches in this journey"
                   >
-                    ~{total} days end to end
+                    {total} days in combined stage targets
                   </span>
                 )}
               </div>

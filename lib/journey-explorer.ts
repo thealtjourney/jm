@@ -40,17 +40,24 @@ export type StageGroup = Omit<GroupDefinition, "codes"> & { stages: StageDetail[
 
 const GROUPS: Record<string, GroupDefinition[]> = {
   property: [
-    { key: "new-homes", title: "Creating a home", description: "From a new opportunity to handing over the keys.", sequence: true, codes: ["P1", "P2", "P3"] },
-    { key: "lifecycle", title: "Across the home's life", description: "Care, investment and changes as a home's needs evolve.", codes: ["P4", "P5", "P6"] },
+    { key: "planning", title: "Planning", description: "Identify the opportunity and plan a home around local need.", sequence: true, codes: ["P1"] },
+    { key: "building", title: "Building", description: "Turn the plans into a safe, well-built home.", sequence: true, codes: ["P2"] },
+    { key: "handover", title: "Handover", description: "Make the home ready for its first residents.", sequence: true, codes: ["P3"] },
+    { key: "home-life", title: "Life of the home", description: "Care for the home and prepare it for new residents. Re-letting can repeat throughout its life.", codes: ["P5", "P4"] },
+    { key: "next-chapter", title: "Next chapter", description: "Plan the home's future through investment, retrofit or disposal.", sequence: true, codes: ["P6"] },
   ],
   customer: [
-    { key: "life-events", title: "Life events", description: "The milestones at the start and end of a tenancy.", sequence: true, codes: ["C4", "C5", "C10"] },
-    { key: "ongoing", title: "Throughout the tenancy", description: "Support and services residents can return to whenever they need them.", codes: ["C7", "C2", "C8", "C9", "C6", "C3", "C1"] },
+    { key: "finding", title: "Finding a home", description: "Understand the options and find a suitable home.", sequence: true, codes: ["C4"] },
+    { key: "moving-in", title: "Moving in", description: "Receive the keys and settle into the new home.", sequence: true, codes: ["C5"] },
+    { key: "living", title: "Living in my home", description: "Choose a service below. These can recur throughout a tenancy and have their own start and finish.", codes: ["C7", "C2", "C8", "C9", "C6", "C3", "C1"] },
+    { key: "moving-on", title: "Moving on", description: "Bring the tenancy to a clear, supported conclusion.", sequence: true, codes: ["C10"] },
   ],
   owner: [
-    { key: "buying", title: "Finding and buying a home", description: "From the first enquiry to moving in.", sequence: true, codes: ["O4", "O5", "O6"] },
-    { key: "ownership", title: "During ownership", description: "Living in the home, with options to buy more shares or move on.", codes: ["O7", "O8", "O9"] },
-    { key: "support", title: "Support throughout", description: "Our service principles, help and the homeowner's voice.", codes: ["O1", "O2", "O3"] },
+    { key: "finding", title: "Finding a home", description: "Explore shared ownership and understand the commitments.", sequence: true, codes: ["O4"] },
+    { key: "buying", title: "Buying my home", description: "Follow the purchase through to completion.", sequence: true, codes: ["O5"] },
+    { key: "moving-in", title: "Moving in", description: "Receive the keys and settle into the home.", sequence: true, codes: ["O6"] },
+    { key: "living", title: "Living in my home", description: "Everyday support and the option to buy more shares. Buying a bigger share is optional.", codes: ["O7", "O8", "O1", "O2", "O3"] },
+    { key: "moving-on", title: "Selling & moving on", description: "Understand the sale and get support through the next move.", sequence: true, codes: ["O9"] },
   ],
 };
 

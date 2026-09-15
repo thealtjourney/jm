@@ -21,12 +21,23 @@ test("all 25 stages remain available once across the three regrouped journeys", 
   }
 });
 
-test("repairs and complaints are ongoing services, not steps between moving in and moving on", () => {
+test("the resident route runs from finding a home to moving on, with recurring services in the living phase", () => {
   const stages = STAGE_SEED.filter(s => s.journeyKey === "customer").map(s => stage(s.code));
   const groups = groupJourneyStages({ key: "customer", stages });
-  assert.deepEqual(groups.find(g => g.sequence)?.stages.map(s => s.code), ["C4", "C5", "C10"]);
-  assert.ok(groups.find(g => !g.sequence)?.stages.some(s => s.code === "C7"));
-  assert.ok(groups.find(g => !g.sequence)?.stages.some(s => s.code === "C9"));
+  assert.deepEqual(groups.map(g => g.key), ["finding", "moving-in", "living", "moving-on"]);
+  assert.equal(groups[0].stages[0].code, "C4");
+  assert.equal(groups.at(-1)?.stages[0].code, "C10");
+  assert.ok(groups.find(g => g.key === "living")?.stages.some(s => s.code === "C7"));
+  assert.ok(groups.find(g => g.key === "living")?.stages.some(s => s.code === "C9"));
+});
+
+test("the property and ownership journeys have explicit beginnings and endings", () => {
+  for (const [key, first, last] of [["property", "P1", "P6"], ["owner", "O4", "O9"]]) {
+    const stages = STAGE_SEED.filter(s => s.journeyKey === key).map(s => stage(s.code));
+    const groups = groupJourneyStages({ key, stages });
+    assert.equal(groups[0].stages[0].code, first);
+    assert.equal(groups.at(-1)?.stages.at(-1)?.code, last);
+  }
 });
 
 test("a role subset cannot gain unrelated stages when grouped", () => {

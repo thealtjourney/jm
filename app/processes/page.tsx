@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Route } from "lucide-react";
 import { getJourneys, getLibraries } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -31,11 +32,14 @@ export default async function ProcessesPage() {
           Processes
         </h1>
         <p className="mt-3 text-lg text-muted">
-          Every operational process, grouped by the team that owns it. Open one
-          to see it start to finish: the journey stages it runs through, who is
-          accountable at each, and how long each step should take.
+          Follow a service from first contact to resolution, or explore the
+          operational processes and journey stages behind it.
         </p>
       </div>
+
+      <Link href="/processes/repairs" className="process-walkthrough-link mb-9"><span><Route size={20} /><strong>Repairs, start to finish</strong><small>Explore six steps, team handovers and alternative routes · Draft for review</small></span><span aria-hidden="true">→</span></Link>
+
+      <h2 className="mb-5 text-xl font-semibold">Operational process library</h2>
 
       <div className="flex flex-col gap-10">
         {[...groups.entries()]

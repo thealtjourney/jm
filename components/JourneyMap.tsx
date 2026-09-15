@@ -10,6 +10,7 @@ import { groupJourneyStages, journeyMeasures, stagePresentation } from "@/lib/jo
 import { setRoleCookie } from "@/lib/role-cookie";
 import StageDetail from "./StageDetail";
 import AdminBar from "./AdminBar";
+import ConnectedRoute from "./ConnectedRoute";
 
 type Library = {
   policies: { code: string; name: string; category: string }[];
@@ -34,10 +35,14 @@ export default function JourneyMap({ journeys, library, initialAdmin, roles, act
   const stageCode = params.get("stage") ?? "";
   const journeyKey = params.get("journey") ?? journeys.find(j => j.stages.some(s => s.code === stageCode))?.key ?? "customer";
   const journey = visible.find(j => j.key === journeyKey) ?? visible[0];
+  const fullJourney = journeys.find(j => j.key === journey?.key);
+  const allGroups = useMemo(() => fullJourney ? groupJourneyStages(fullJourney) : [], [fullJourney]);
   const groups = useMemo(() => journey ? groupJourneyStages(journey) : [], [journey]);
   const orderedStages = groups.flatMap(group => group.stages);
   const stage = orderedStages.find(s => s.code === stageCode) ?? orderedStages[0];
   const stageIndex = orderedStages.findIndex(s => s.code === stage?.code);
+  const selectedGroup = groups.find(group => group.stages.some(s => s.code === stage?.code));
+  const phaseIndex = allGroups.findIndex(group => group.key === selectedGroup?.key);
   const measures = useMemo(() => journey ? journeyMeasures(journey) : [], [journey]);
   const measure = measures.find(tsm => tsm.code === selectedMeasure);
   const theme = journeyTheme(journey?.key ?? journeyKey);
@@ -86,28 +91,37 @@ export default function JourneyMap({ journeys, library, initialAdmin, roles, act
         {roles.length > 0 && <label className="role-select"><Users size={17} /><span className="sr-only">View as a role</span><select value={activeRole.key} onChange={event => chooseRole(event.target.value)}>{roles.map(role => <option key={role.key} value={role.key}>{role.name}</option>)}</select></label>}
       </div>
       <section className="explorer" style={journeyStyle(journey?.key ?? journeyKey)} aria-label="Journey stages">
-        <div className="explorer-titlebar"><div><span className="journey-indicator" /><h2>{theme.name}</h2><span className="stage-count">{orderedStages.length} stages{focused ? " in this role" : ""}</span></div><div className="view-toggle" role="group" aria-label="Stage layout"><button type="button" aria-label="Map view" aria-pressed={view === "map"} onClick={() => setView("map")}><Route size={16} /><span>Map</span></button><button type="button" aria-label="List view" aria-pressed={view === "list"} onClick={() => setView("list")}><LayoutList size={16} /><span>List</span></button></div></div>
+        <div className="explorer-titlebar"><div><span className="journey-indicator" /><h2>{theme.name}</h2><span className="stage-count">{allGroups.length} phases · {orderedStages.length} stages{focused ? " in this role" : ""}</span></div><div className="view-toggle" role="group" aria-label="Stage layout"><button type="button" aria-label="Journey view" aria-pressed={view === "map"} onClick={() => setView("map")}><Route size={16} /><span>Journey</span></button><button type="button" aria-label="All stages view" aria-pressed={view === "list"} onClick={() => setView("list")}><LayoutList size={16} /><span>All stages</span></button></div></div>
         {focused && <div className="focus-note">Showing stages relevant to {activeRole.name.toLowerCase()}. <button onClick={() => setShowAll(true)}>Show all stages</button></div>}
         {!journey || !stage || !presentation ? <div className="empty-journey"><Route size={30} /><h3>No stages to show yet</h3><p>Journey stages will appear here once they have been added.</p>{focused && <button className="button-secondary" onClick={() => setShowAll(true)}>Show all stages</button>}</div> : <div className="explorer-columns">
           <div className="journey-canvas">
+            <div className="route-bookends"><span>THE JOURNEY BEGINS</span><span>{journey.key === "property" ? "A HOME'S NEXT CHAPTER" : "THE NEXT CHAPTER"}</span></div>
+            <ConnectedRoute label={`${theme.name}, start to finish`} controls="selected-stage-panel" selected={selectedGroup?.key ?? ""} stops={allGroups.map(group => {
+              const eligible = groups.find(g => g.key === group.key);
+              const matches = eligible?.stages.filter(s => measure?.stageCodes.includes(s.code)).length ?? 0;
+              return { id: group.key, label: group.title, disabled: !eligible, highlighted: matches > 0, caption: !eligible ? "Outside this role" : matches ? `${measure?.code} · ${matches} ${matches === 1 ? "link" : "links"}` : `${eligible.stages.length} ${eligible.stages.length === 1 ? "stage" : "stages"}` };
+            })} onSelect={key => { const first = groups.find(group => group.key === key)?.stages[0]; if (first) choose(journey, first); }} />
             <div className="connection-lens"><label htmlFor="measure-lens"><Network size={16} /><span>Trace a TSM</span></label><select id="measure-lens" value={measure?.code ?? ""} onChange={event => setSelectedMeasure(event.target.value)}><option value="">All connections</option>{measures.map(tsm => <option key={tsm.code} value={tsm.code}>{tsm.code} · {tsm.name}</option>)}</select>{measure && <button className="icon-button" type="button" aria-label="Clear TSM highlight" onClick={() => setSelectedMeasure("")}><X size={15} /></button>}</div>
             <div className="connection-status" aria-live="polite">{measure ? <><strong>{measure.code}</strong> connects to {measure.stageCodes.length} {measure.stageCodes.length === 1 ? "stage" : "stages"}{focused ? " in this role" : " in this journey"}. <Link href={`/tsm/${measure.code}`}>Measure details <ArrowUpRight size={13} /></Link></> : "Select a stage to see the resident outcome and service standard."}</div>
             <button className="mobile-detail-jump" type="button" onClick={showSelectedDetail}>View {presentation.label.toLowerCase()} details <ArrowRight size={16} /></button>
-            {groups.map(group => <section className={`journey-group ${group.sequence ? "sequence-group" : "service-group"}`} key={group.key} aria-labelledby={`group-${group.key}`}><div className="group-heading">{group.sequence ? <ArrowRight size={16} /> : <Repeat2 size={16} />}<h3 id={`group-${group.key}`}>{group.title}</h3></div><p className="group-description">{group.description}</p><div className={`stage-nodes ${view === "list" ? "nodes-list" : ""}`}>{group.stages.map(s => {
+            {(view === "list" ? groups : groups.filter(group => group.key === selectedGroup?.key && group.stages.length > 1)).map(group => <section className="journey-group phase-services" key={group.key} aria-labelledby={`group-${group.key}`}><div className="group-heading">{group.sequence ? <ArrowRight size={16} /> : <Repeat2 size={16} />}<h3 id={`group-${group.key}`}>{group.title}</h3></div><p className="group-description">{group.description}</p><div className={`stage-nodes ${view === "list" ? "nodes-list" : ""}`}>{group.stages.map(s => {
               const selected = s.code === stage.code;
               const matched = Boolean(measure?.stageCodes.includes(s.code));
               const node = stagePresentation(s);
               return <button type="button" key={s.code} className={`stage-node ${matched ? "tsm-matched" : ""}`} data-stage={s.code} aria-pressed={selected} aria-controls="selected-stage-panel" onClick={() => choose(journey, s)}><span className="node-header"><span className="node-code">{s.code}</span>{selected ? <Check size={16} aria-label="Selected stage" /> : <ArrowUpRight size={15} aria-hidden="true" />}</span><span className="node-title">{node.label}</span><span className="node-subtitle">{s.title}</span>{view === "list" && <span className="node-standard">{firstStandard(s.excellence)}</span>}<span className="node-footer">{matched ? <><Network size={13} />{measure?.code} linked</> : <>{s.tsms.length ? `${s.tsms.length} TSM ${s.tsms.length === 1 ? "connection" : "connections"}` : "Enabling stage"}</>}{s.openChallenges > 0 && <span className="node-feedback" aria-label={`${s.openChallenges} open challenges`}><MessageSquareText size={13} />{s.openChallenges}</span>}</span></button>;
             })}</div></section>)}
-            <div className="canvas-legend"><span><span className="legend-selected" />Selected stage</span>{measure && <span><Network size={14} />TSM connection</span>}<span>Stages can recur or overlap.</span></div>
+            <div className="canvas-legend"><span><span className="legend-selected" />Selected phase</span>{measure && <span><Network size={14} />TSM connection</span>}<span>Services within a phase can recur or overlap.</span></div>
           </div>
           <section id="selected-stage-panel" className="stage-inspector" ref={detailPanel} tabIndex={-1} aria-labelledby="selected-stage-title">
-            <div className="inspector-navigation"><p className="eyebrow">STAGE {stage.code}</p><div><button className="icon-button" type="button" aria-label="Previous stage" disabled={stageIndex <= 0} onClick={() => step(-1)}><ChevronLeft size={17} /></button><button className="icon-button" type="button" aria-label="Next stage" disabled={stageIndex === orderedStages.length - 1} onClick={() => step(1)}><ChevronRight size={17} /></button></div></div>
+            <div className="inspector-navigation"><p className="eyebrow">PHASE {phaseIndex + 1} OF {allGroups.length} · {selectedGroup?.title} · {stage.code}</p><div><button className="text-link route-back-link" type="button" onClick={() => document.querySelector('.journey-canvas')?.scrollIntoView({ block: 'start' })}>Whole journey <Route size={15} /></button><button className="icon-button" type="button" aria-label="Previous stage" disabled={stageIndex <= 0} onClick={() => step(-1)}><ChevronLeft size={17} /></button><button className="icon-button" type="button" aria-label="Next stage" disabled={stageIndex === orderedStages.length - 1} onClick={() => step(1)}><ChevronRight size={17} /></button></div></div>
             <div className="inspector-content" key={stage.code}><h2 id="selected-stage-title">{presentation.label}</h2><p className="inspector-subtitle">{stage.title} · {stage.subtitle}</p><p className="sr-only" aria-live="polite">Selected stage: {stage.code}, {presentation.label}</p>
               <div className="resident-outcome"><p><HeartHandshake size={16} />Resident outcome <span>Our ambition</span></p><h3>{presentation.outcome}</h3></div>
+              {stage.code === "C7" && <Link href="/processes/repairs" className="process-walkthrough-link"><span><Route size={20} /><strong>Explore repairs, start to finish</strong><small>6 steps · handovers, decisions and return visits · draft</small></span><ArrowRight size={21} /></Link>}
+              <div className="stage-detail-columns"><div>
               <div className="inspector-section-heading"><Sparkles size={18} /><h3>What excellence looks like</h3></div>
               <div className="rich-text inspector-standards" dangerouslySetInnerHTML={{ __html: stage.excellence }} />
               <details className="activities-disclosure"><summary>What happens at this stage <ChevronRight size={16} /></summary><div className="rich-text" dangerouslySetInnerHTML={{ __html: stage.activities }} /></details>
+              </div><div>
               <div className="inspector-section-heading"><Network size={18} /><h3>Connected measures</h3><span>{stage.tsms.length}</span></div>
               <p className="section-hint">Select a measure to highlight its stages on the map.</p>
               <div className="measure-buttons">{stage.tsms.map(tsm => <button type="button" key={tsm.code} aria-label={`Highlight ${tsm.code}: ${tsm.name}${!tsm.reportable ? ", indicative link" : ""}`} aria-pressed={measure?.code === tsm.code} onClick={() => setSelectedMeasure(measure?.code === tsm.code ? "" : tsm.code)}><span>{tsm.code}</span><span>{tsm.name}</span>{!tsm.reportable && <small>Indicative</small>}</button>)}</div>
@@ -118,6 +132,7 @@ export default function JourneyMap({ journeys, library, initialAdmin, roles, act
               <div className="inspector-resources"><button type="button" onClick={() => setDetail("processes")}><Workflow size={16} />{stage.processes.length} processes<ChevronRight size={14} /></button><button type="button" onClick={() => setDetail("policies")}><FileText size={16} />{stage.policies.length} policies<ChevronRight size={14} /></button></div>
               <div className="inspector-feedback"><MessageSquareText size={19} /><div><h3>Help shape this stage</h3><p>{stage.openChallenges ? `${stage.openChallenges} open ${stage.openChallenges === 1 ? "challenge" : "challenges"} for discussion` : "Does this reflect the experience residents should have?"}</p></div><button type="button" aria-label="Review this stage and give feedback" onClick={() => setDetail("excellence")}><ArrowUpRight size={19} /></button></div>
               <button className="button-secondary inspector-full-detail" type="button" onClick={() => setDetail(activeRole.leadAnswer)}>Full stage detail{admin ? " & editing" : ""}<ArrowUpRight size={16} /></button>
+              </div></div>
             </div>
           </section>
         </div>}

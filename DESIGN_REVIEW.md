@@ -14,10 +14,14 @@ into a case management system.
   identity across the application.
 - The bright Daylight design pairs a dark navigation rail with a pale canvas,
   white panels and restrained blue, green and lime accents.
-- Compact journey selectors lead into a map beside the selected stage's details.
+- Compact journey selectors lead into a full-width route with numbered phases,
+  connecting arrows and a clear beginning and end. Details open below the route.
   Plain-language labels make stages easier to find; original titles remain visible.
-- Life events are grouped separately from ongoing services. A list view remains
-  available, and all 25 stages and their authored content are retained.
+- The resident journey follows finding a home, moving in, living in the home and
+  moving on. Recurring services branch from the living phase. Equivalent routes
+  cover the property lifecycle and shared ownership. All 25 stages remain intact.
+- An "All stages" view keeps the complete catalogue available. Role filters retain
+  the full phase route for context, disabling phases outside the selected role.
 - Each stage starts with a proposed resident outcome labelled "Our ambition".
 - Selecting a TSM highlights its connected stages using the stored mappings.
   Counts follow the active role filter, including indicative links.
@@ -29,6 +33,24 @@ into a case management system.
 - The stage dialog uses native modal focus handling, Escape dismissal and focus
   restoration. Responsive layouts, mobile navigation and reduced-motion styles
   are included. The Board pack entry remains hidden.
+
+## First process walkthrough
+
+Repairs now has its own six-step walkthrough at `/processes/repairs`, linked from
+stage C7 and the process library. It covers reporting, assessment, booking, the
+visit, confirmation and resident follow-up. Alternative routes cover urgent
+response, return visits, no access and unresolved repairs returning to assessment.
+
+Each step includes a proposed resident outcome, excellence statements and a team
+handover. Team names come from the existing process owners. The TSM links remain
+the actual C7 stage mappings; the page does not imply that these are validated
+step-level mappings. Circles indicate the selected step, not completion.
+
+The walkthrough is clearly labelled **Draft for review**. Its typed content is in
+`lib/process-workflows.ts`, ready to extend to other services after review. It does
+not write resident cases, change approved policies or add database records. The
+existing stage editor still edits the authored stage standards; workflow copy
+currently changes through the repository.
 
 ## Landing page decision
 
@@ -80,6 +102,6 @@ data. The new resident outcomes and navigation groupings are presentation copy;
 authored standards remain editable through the existing administration tools.
 
 Validation covers a production build, lint, preservation of all 25 stages and
-TSM mappings, role-filtered counts, direct stage links, supporting-page responses,
-and desktop/mobile interaction checks. Publishing follows the existing GitHub
+TSM mappings, role-filtered counts, direct stage links, valid process transitions,
+supporting-page responses and desktop/mobile interaction checks. Publishing follows the existing GitHub
 to Vercel workflow.
