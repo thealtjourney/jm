@@ -12,14 +12,30 @@ into a case management system.
 - The property journey is blue, rented customer journey green, and shared
   ownership journey orange. A shared navigation and type system carries the
   identity across the application.
-- Journey selectors, a connected stage path and a list view make browsing easier.
+- The bright Daylight design pairs a dark navigation rail with a pale canvas,
+  white panels and restrained blue, green and lime accents.
+- Compact journey selectors lead into a map beside the selected stage's details.
+  Plain-language labels make stages easier to find; original titles remain visible.
+- Life events are grouped separately from ongoing services. A list view remains
+  available, and all 25 stages and their authored content are retained.
+- Each stage starts with a proposed resident outcome labelled "Our ambition".
+- Selecting a TSM highlights its connected stages using the stored mappings.
+  Counts follow the active role filter, including indicative links.
 - Excellence and TSM connections are visible together. Activities, detailed
   measures, processes, policies and editing remain available in stage detail.
 - Teams and indicative timescales appear alongside each stage.
 - Role preferences remain available without hiding the rest of the service.
 - Direct stage URLs work from search and TSM pages.
 - The stage dialog uses native modal focus handling, Escape dismissal and focus
-  restoration. Responsive layouts and reduced-motion styles are included.
+  restoration. Responsive layouts, mobile navigation and reduced-motion styles
+  are included. The Board pack entry remains hidden.
+
+## Landing page decision
+
+The explorer itself is the landing page, with a short introduction and immediate
+access to all three journeys. A separate welcome page would add a step for
+regular users. Revisit a dedicated introduction if the audience expands to
+external visitors who need context before using the tool.
 
 ## Findings to act on
 
@@ -59,6 +75,11 @@ performance dashboard.
 
 The existing Next.js, Postgres, API and authentication structure is retained.
 No production database migrations, live records, credentials or deployment
-settings were changed for the redesign. A temporary local database populated
-from the existing seed files was used to preview the application because the
-configured local database was unavailable.
+settings were changed for the redesign. Local previews read the existing Neon
+data. The new resident outcomes and navigation groupings are presentation copy;
+authored standards remain editable through the existing administration tools.
+
+Validation covers a production build, lint, preservation of all 25 stages and
+TSM mappings, role-filtered counts, direct stage links, supporting-page responses,
+and desktop/mobile interaction checks. Publishing follows the existing GitHub
+to Vercel workflow.

@@ -26,6 +26,7 @@ export default async function MapPage({ searchParams }: { searchParams: Promise<
 
   return (
     <JourneyMap
+      key={`${params.journey ?? ""}:${params.stage ?? ""}:${activeRole?.key ?? "everyone"}`}
       journeys={journeys}
       initialAdmin={admin}
       roles={roles}
