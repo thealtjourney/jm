@@ -34,6 +34,19 @@ into a case management system.
   restoration. Responsive layouts, mobile navigation and reduced-motion styles
   are included. The Board pack entry remains hidden.
 
+## Laptop layout
+
+The navigation header, route and stage heading use compact spacing. In the
+journey view, services are short buttons; the full cards remain available in
+"All stages". TSM tracing sits in the journey toolbar, and the Repairs link sits
+beside its stage heading. The sidebar becomes a menu below 900px to leave more
+space for content in a narrow preview window. Body text retains a readable size.
+
+Before this change, Repairs detail started around 1,084px down the page at
+1366 × 768. The compact layout brings it to around 371px, leaving the route,
+resident outcome, standards and TSM connections visible much earlier. Longer
+standards, expanded activities and library information still use normal scrolling.
+
 ## First process walkthrough
 
 Repairs now has its own six-step walkthrough at `/processes/repairs`, linked from
